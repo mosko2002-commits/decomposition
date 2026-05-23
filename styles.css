@@ -1800,6 +1800,82 @@ select:focus {
     padding: 0 10px;
   }
 
+  .compare-table-wrap {
+    overflow: visible;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .compare-table,
+  .compare-table thead,
+  .compare-table tbody,
+  .compare-table tr,
+  .compare-table th,
+  .compare-table td {
+    display: block;
+  }
+
+  .compare-table {
+    min-width: 0;
+  }
+
+  .compare-table thead {
+    display: none;
+  }
+
+  .compare-table tbody {
+    display: grid;
+    gap: var(--mobile-gap);
+  }
+
+  .compare-table tbody tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: var(--mobile-pad);
+    border-radius: var(--mobile-radius);
+    background: var(--panel);
+    box-shadow: var(--card-shadow);
+  }
+
+  .compare-table tbody tr:hover,
+  .compare-table tbody tr.is-best,
+  .compare-table tbody tr.is-active,
+  .compare-table tbody tr.is-active.is-loss {
+    background: var(--panel);
+  }
+
+  .compare-table tbody tr.is-active {
+    box-shadow: inset 3px 0 0 var(--blue), var(--card-shadow);
+  }
+
+  .compare-table td {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .compare-table td::before {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted);
+    content: attr(data-label);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-transform: uppercase;
+  }
+
+  .compare-table td.name {
+    grid-column: 1 / -1;
+  }
+
+  .compare-table td.name::before {
+    content: "Сценарий";
+  }
+
   .map-card {
     min-height: 128px;
     grid-template-columns: 38px minmax(0, 1fr);
