@@ -607,6 +607,15 @@ function formatControlMetaWithConfig(config, value) {
   return `${formatNumber(value, digits)}${config.unit === "%" ? "%" : ` ${config.unit}`}`;
 }
 
+function focusEditInput(input) {
+  input.focus({ preventScroll: true });
+  input.select();
+  const length = input.value.length;
+  if (input.setSelectionRange) {
+    input.setSelectionRange(0, length);
+  }
+}
+
 function startControlEdit(card, field) {
   const control = card.querySelector(`[data-control="${field}"]`);
   const input = card.querySelector(`.value-edit-input[data-field="${field}"]`);
@@ -617,10 +626,7 @@ function startControlEdit(card, field) {
   control.classList.add("is-editing");
   input.hidden = false;
   input.dataset.previousValue = input.value;
-  requestAnimationFrame(() => {
-    input.focus();
-    input.select();
-  });
+  focusEditInput(input);
 }
 
 function closeControlEdit(input, shouldCommit) {
@@ -707,10 +713,7 @@ function startLtvControlEdit(field) {
   control.classList.add("is-editing");
   input.hidden = false;
   input.dataset.previousValue = input.value;
-  requestAnimationFrame(() => {
-    input.focus();
-    input.select();
-  });
+  focusEditInput(input);
 }
 
 function closeLtvControlEdit(input, shouldCommit) {
