@@ -439,11 +439,11 @@ function renderComparison() {
     row.classList.toggle("is-active", index === activeScenarioIndex);
     row.classList.toggle("is-best", isBest);
     row.classList.toggle("is-loss", result.netProfit < 0);
-    row.append(createComparisonCell("name", scenario.name || "Сценарий", index === activeScenarioIndex ? "Активный" : isBest ? "Лучший" : result.netProfit < 0 ? "Убыток" : ""));
+    row.append(setComparisonLabel(createComparisonCell("name", scenario.name || "Сценарий", index === activeScenarioIndex ? "Активный" : isBest ? "Лучший" : result.netProfit < 0 ? "Убыток" : ""), "Сценарий"));
     visibleColumns.forEach((column) => {
       const toneValue = column.tone ? column.tone({ result, scenario }) : null;
       const toneClass = toneValue > 0 ? " is-positive" : toneValue < 0 ? " is-negative" : "";
-      row.append(createComparisonCell(`${column.type}${toneClass}`, column.value({ result, scenario })));
+      row.append(setComparisonLabel(createComparisonCell(`${column.type}${toneClass}`, column.value({ result, scenario })), column.label));
     });
     return row;
   }));
@@ -480,6 +480,11 @@ function createComparisonCell(type, text, badge = "") {
   }
 
   cell.textContent = text;
+  return cell;
+}
+
+function setComparisonLabel(cell, label) {
+  cell.dataset.label = label;
   return cell;
 }
 
