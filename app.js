@@ -48,6 +48,8 @@ const compareSection = document.querySelector(".scenario-compare");
 const compareHead = document.querySelector("#compare-head");
 const compareBody = document.querySelector("#compare-body");
 const compareFilters = document.querySelector(".compare-filters");
+const compareSort = document.querySelector(".compare-sort");
+const activeSummary = document.querySelector("[data-active-summary]");
 const resetButton = document.querySelector("#reset-button");
 const printButton = document.querySelector("#print-button");
 const tabButtons = document.querySelectorAll("[data-tab-target]");
@@ -97,6 +99,7 @@ let scenarios = readScenarios();
 let ltv = readLtv();
 let fitFrame = 0;
 let activeScenarioIndex = readActiveScenarioIndex();
+let compareSortKey = "netProfit";
 
 const compareColumns = [
   { key: "budget", label: "Бюджет", type: "money", value: ({ result }) => formatMoney(result.budget) },
@@ -421,20 +424,23 @@ function renderComparison() {
     scenario,
     result: calculate(scenario),
   }));
+  const sortedComparisons = sortComparisons(comparisons);
   const bestProfit = Math.max(...comparisons.map(({ result }) => result.netProfit));
   const bestRoi = Math.max(...comparisons.map(({ result }) => result.roi));
   const visibleColumns = getVisibleCompareColumns();
+  renderActiveSummary(comparisons.find(({ index }) => index === activeScenarioIndex) || comparisons[0]);
 
   const headRow = document.createElement("tr");
   headRow.append(createTableHeadCell("Сценарий"));
   visibleColumns.forEach((column) => headRow.append(createTableHeadCell(column.label)));
   compareHead.replaceChildren(headRow);
 
-  compareBody.replaceChildren(...comparisons.map(({ index, scenario, result }) => {
+  compareBody.replaceChildren(...sortedComparisons.map(({ index, scenario, result }) => {
     const row = document.createElement("tr");
     const isBest = result.netProfit === bestProfit || result.roi === bestRoi;
 
     row.dataset.compareIndex = String(index);
+    row.dataset.detailOpen = index === activeScenarioIndex ? "true" : "false";
     row.tabIndex = 0;
     row.classList.toggle("is-active", index === activeScenarioIndex);
     row.classList.toggle("is-best", isBest);
@@ -443,10 +449,49 @@ function renderComparison() {
     visibleColumns.forEach((column) => {
       const toneValue = column.tone ? column.tone({ result, scenario }) : null;
       const toneClass = toneValue > 0 ? " is-positive" : toneValue < 0 ? " is-negative" : "";
-      row.append(setComparisonLabel(createComparisonCell(`${column.type}${toneClass}`, column.value({ result, scenario })), column.label));
+      const cell = setComparisonLabel(createComparisonCell(`${column.type}${toneClass}`, column.value({ result, scenario })), column.label);
+      cell.classList.toggle("is-mobile-primary", ["netProfit", "roi", "clients"].includes(column.key));
+      row.append(cell);
     });
+    const details = document.createElement("td");
+    details.className = "compare-details";
+    details.colSpan = visibleColumns.length + 1;
+    details.append(createDetailsButton(index === activeScenarioIndex));
+    row.append(details);
     return row;
   }));
+}
+
+function sortComparisons(comparisons) {
+  const getters = {
+    netProfit: ({ result }) => result.netProfit,
+    roi: ({ result }) => result.roi,
+    clients: ({ result }) => result.clients,
+  };
+  const getter = getters[compareSortKey] || getters.netProfit;
+  return [...comparisons].sort((a, b) => getter(b) - getter(a));
+}
+
+function renderActiveSummary(item) {
+  if (!item || !activeSummary) {
+    return;
+  }
+
+  activeSummary.innerHTML = `
+    <span>Активный сценарий</span>
+    <strong>${item.scenario.name || "Сценарий"}</strong>
+    <em>Чистая прибыль: ${formatMoney(item.result.netProfit, 0)}</em>
+    <em>ROI: ${formatPercent(item.result.roi, 1)}</em>
+    <em>Клиентов: ≈${formatNumber(Math.round(item.result.clients))}</em>
+  `;
+}
+
+function createDetailsButton(isActive) {
+  const button = document.createElement("button");
+  button.className = "compare-action";
+  button.type = "button";
+  button.textContent = isActive ? "Активный сценарий" : "Сделать активным";
+  return button;
 }
 
 function getVisibleCompareColumns() {
@@ -1489,6 +1534,19 @@ compareFilters.addEventListener("change", (event) => {
   if (!document.querySelector("[data-compare-toggle]:checked")) {
     event.target.checked = true;
   }
+  renderComparison();
+});
+
+compareSort.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-compare-sort]");
+  if (!button) {
+    return;
+  }
+
+  compareSortKey = button.dataset.compareSort;
+  compareSort.querySelectorAll("[data-compare-sort]").forEach((item) => {
+    item.classList.toggle("is-active", item === button);
+  });
   renderComparison();
 });
 
