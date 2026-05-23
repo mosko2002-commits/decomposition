@@ -508,16 +508,20 @@ p {
   transition: background 150ms ease, box-shadow 150ms ease;
 }
 
-.compare-table tbody tr:hover,
+.compare-table tbody tr:hover {
+  background: rgba(15, 23, 42, 0.025);
+}
+
 .compare-table tbody tr.is-best {
-  background: rgba(37, 99, 235, 0.045);
+  background: transparent;
 }
 
 .compare-table tbody tr.is-loss {
   background: transparent;
 }
 
-.compare-table tbody tr.is-active {
+.compare-table tbody tr.is-active,
+.compare-table tbody tr.is-active:hover {
   background: rgba(37, 99, 235, 0.07);
   box-shadow: inset 3px 0 0 var(--blue);
 }
@@ -542,8 +546,8 @@ p {
 
 .compare-table .name span {
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.09);
-  color: var(--blue);
+  background: rgba(100, 116, 139, 0.1);
+  color: var(--muted);
   padding: 4px 7px;
   font-size: 11px;
   font-weight: 600;
@@ -1039,9 +1043,16 @@ select:focus {
 .zero-layout {
   display: grid;
   grid-column: 1 / -1;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
   align-items: start;
+}
+
+.scenario-insights {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
 .zero-panel,
@@ -1051,7 +1062,7 @@ select:focus {
 }
 
 .zero-panel {
-  margin-top: 14px;
+  margin-top: 0;
   background: transparent;
   padding: 0;
 }
@@ -1335,7 +1346,8 @@ select:focus {
   margin-top: 0;
 }
 
-.ltv-insights .insight-panel {
+.ltv-insights .insight-panel,
+.scenario-insights .insight-panel {
   grid-area: auto;
 }
 
@@ -1571,6 +1583,7 @@ select:focus {
   .scenario-layout,
   .ltv-layout,
   .zero-layout,
+  .scenario-insights,
   .map-summary {
     grid-template-columns: 1fr;
   }
@@ -1710,6 +1723,7 @@ select:focus {
   .scenario-layout,
   .ltv-layout,
   .zero-layout,
+  .scenario-insights,
   .funnel-map {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1747,6 +1761,7 @@ select:focus {
   .ltv-inputs,
   .ltv-results,
   .ltv-insights,
+  .scenario-insights,
   .funnel-map {
     grid-template-columns: 1fr;
   }
@@ -1823,6 +1838,7 @@ select:focus {
   .scenario-layout,
   .ltv-layout,
   .zero-layout,
+  .scenario-insights,
   .ltv-insights,
   .funnel-map,
   .map-summary {
@@ -1993,12 +2009,13 @@ select:focus {
 
   .compare-table tbody tr:hover,
   .compare-table tbody tr.is-best,
-  .compare-table tbody tr.is-active,
   .compare-table tbody tr.is-active.is-loss {
     background: var(--panel);
   }
 
-  .compare-table tbody tr.is-active {
+  .compare-table tbody tr.is-active,
+  .compare-table tbody tr.is-active:hover {
+    background: var(--panel);
     box-shadow: inset 3px 0 0 var(--blue), var(--card-shadow);
   }
 
@@ -2145,6 +2162,16 @@ select:focus {
   .result-card.small .metric-value,
   .zero-metrics .metric-value {
     font-size: 22px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .scenario-insights {
+    grid-template-columns: 1fr !important;
+  }
+
+  .scenario-insights .insight-panel {
+    width: 100%;
   }
 }
 
